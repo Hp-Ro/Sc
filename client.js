@@ -1,46 +1,46 @@
+(function () {
+  var socket = new WebSocket('ws://127.0.0.1:7769');
 
+  socket.onopen = function (event) {
+    console.log('WebSocket opened');
+  };
 
-(function(){
-  alert("injected")
-  function load_script(url) {
-    return new Promise(function (resolve, reject){
-      var head = document.getElementsByTagName('head')[0];
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.onload = resolve;
-      script.onerror = reject;
-      script.src = url;
-      head.appendChild(script);
-    })
-  }
+  socket.onmessage = function (event) {
+    console.log('Received message from server:', event.data);
+    // Process the received message as needed
+  };
 
-  load_script('https://raw.githubusercontent.com/Hp-Ro/Sc/main/socket.io.js').then(function() {
-    var socket = io.connect('http://127.0.0.1:7769');
-    var interval = 10;
+  socket.onclose = function (event) {
+    console.log('WebSocket closed');
+  };
 
-    function poll_activity() {
-      var $title = document.querySelector(".playbackSoundBadge__titleLink"),
-        $progress = document.querySelector(".playbackTimeline__progressWrapper"),
-        $play = document.querySelector(".playControls__play");
+  var interval = 10;
 
-      if (!$title || !$progress || !$play)
-        return;
+  function pollActivity() {
+    var $title = document.querySelector(".playbackSoundBadge__titleLink"),
+      $progress = document.querySelector(".playbackTimeline__progressWrapper"),
+      $play = document.querySelector(".playControls__play");
 
-      var url = "https://soundcloud.com" + $title.getAttribute("href"),
-        pos = parseInt($progress.getAttribute("aria-valuenow"), 10),
-        playing = $play.classList.contains("playing");
-
-      if (!playing)
-        return;
-
-      socket.emit('activity', { url, pos });
+    if (!$title || !$progress || !$play) {
+      console.log("Missing elements");
+      return;
     }
 
-    poll_activity();
-    setInterval(poll_activity, interval * 1000);
-  })
-  .catch(function(err) {
-    console.error('soundcloud-rp', err);
-  });
+    var url = "https://soundcloud.com" + $title.getAttribute("href"),
+      pos = parseInt($progress.getAttribute("aria-valuenow"), 10),
+      playing = $play.classList.contains("playing");
+
+    if (!playing) {
+      console.log("Not playing");
+      return;
+    }
+
+    console.log("Emitting activity");
+    var message = JSON.stringify({ url, pos });
+    socket.send(message);
+  }
+
+  pollActivity();
+  setInterval(pollActivity, interval * 1000);
 
 })();
