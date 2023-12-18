@@ -14,7 +14,7 @@
     })
   }
 
-  load_script('http://127.0.0.1:7769/socket.io/socket.io.js').then(function() {
+  load_script('https://raw.githubusercontent.com/Hp-Ro/Sc/main/socket.io.js').then(function() {
     var socket = io.connect('http://127.0.0.1:7769');
     var interval = 10;
 
