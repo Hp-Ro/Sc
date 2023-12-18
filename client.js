@@ -1,6 +1,7 @@
 
 
 (function(){
+  alert("injected")
   function load_script(url) {
     return new Promise(function (resolve, reject){
       var head = document.getElementsByTagName('head')[0];
@@ -16,7 +17,7 @@
   load_script('http://127.0.0.1:7769/socket.io/socket.io.js').then(function() {
     var socket = io.connect('http://127.0.0.1:7769');
     var interval = 10;
-alert("injected")
+
     function poll_activity() {
       var $title = document.querySelector(".playbackSoundBadge__titleLink"),
         $progress = document.querySelector(".playbackTimeline__progressWrapper"),
